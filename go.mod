@@ -1,4 +1,4 @@
-module github.com/torngkab/accounts-service
+module github.com/torngkab/grit-account-service
 
 go 1.24.2
 
