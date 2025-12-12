@@ -10,11 +10,11 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	pb "github.com/torngkab/accounts-service/account"
-	"github.com/torngkab/accounts-service/config"
-	"github.com/torngkab/accounts-service/database"
-	"github.com/torngkab/accounts-service/model"
-	"github.com/torngkab/accounts-service/utils"
+	pb "github.com/torngkab/grit-account-service/account"
+	"github.com/torngkab/grit-account-service/config"
+	"github.com/torngkab/grit-account-service/database"
+	"github.com/torngkab/grit-account-service/model"
+	"github.com/torngkab/grit-account-service/utils"
 	"gorm.io/gorm"
 
 	"google.golang.org/grpc"
