@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+option go_package = "accounts-service/account";
+option java_multiple_files = true;
+option java_package = "io.grpc.accounts-service.account";
+option java_outer_classname = "AccountProto";
+
+package account;
+
+service Account {
+  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {}
+  rpc GetAccountsByUserId (GetAccountsByUserIdRequest) returns (GetAccountsByUserIdResponse) {}
+  rpc GetAccountBalance (GetAccountBalanceRequest) returns (GetAccountBalanceResponse) {}
+  rpc SetAccountBalance (SetAccountBalanceRequest) returns (SetAccountBalanceResponse) {}
+  rpc ValidateAccountBalance (ValidateAccountBalanceRequest) returns (ValidateAccountBalanceResponse) {}
+}
+
+message CreateUserRequest {
+  string username = 1;
+  string password = 2;
+  optional string referral_code = 3;
+}
+
+message CreateUserResponse {
+  string message = 1;
+}
+
+message GetAccountsByUserIdRequest {
+  string user_id = 1;
+}
+
+message GetAccountsByUserIdResponse {
+  repeated AccountModel accounts = 1;
+}
+
+message AccountModel {
+  string id = 1;
+  string user_id = 2;
+  string account_type = 3;
+  string status = 4;
+  string created_at = 5;
+  string updated_at = 6;
+}
+
+message GetAccountBalanceRequest {
+  string account_id = 1;
+}
+
+message GetAccountBalanceResponse {
+  float balance = 1;
+  string latest_updated_at = 2;
+}
+
+message SetAccountBalanceRequest {
+  string account_id = 1;
+  float balance = 2;
+}
+
+message SetAccountBalanceResponse {
+  float balance = 1;
+  string latest_updated_at = 2;
+}
+
+message ValidateAccountBalanceRequest {
+  string account_id = 1;
+  float amount = 2;
+}
+
+message ValidateAccountBalanceResponse {
+  bool is_valid = 1;
+}
