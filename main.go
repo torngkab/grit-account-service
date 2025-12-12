@@ -53,6 +53,9 @@ func (s *server) CreateUser(ctx context.Context, in *pb.CreateUserRequest) (*pb.
 				Id:          accountId,
 				UserId:      user.Id,
 				AccountType: model.AccountTypeMain,
+				Status:      model.AccountStatusActive,
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
 			},
 		}
 		if err := tx.Create(&accounts).Error; err != nil {
@@ -63,8 +66,9 @@ func (s *server) CreateUser(ctx context.Context, in *pb.CreateUserRequest) (*pb.
 		// Create balances
 		balances := []model.Balance{
 			{
-				AccountId: accountId,
-				Balance:   0,
+				AccountId:       accountId,
+				Balance:         0,
+				LatestUpdatedAt: time.Now(),
 			},
 		}
 		if err := tx.Create(&balances).Error; err != nil {
