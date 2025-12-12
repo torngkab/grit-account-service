@@ -27,6 +27,7 @@ type AccountClient interface {
 	GetAccountBalance(ctx context.Context, in *GetAccountBalanceRequest, opts ...grpc.CallOption) (*GetAccountBalanceResponse, error)
 	SetAccountBalance(ctx context.Context, in *SetAccountBalanceRequest, opts ...grpc.CallOption) (*SetAccountBalanceResponse, error)
 	ValidateAccountBalance(ctx context.Context, in *ValidateAccountBalanceRequest, opts ...grpc.CallOption) (*ValidateAccountBalanceResponse, error)
+	SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*SignInResponse, error)
 }
 
 type accountClient struct {
@@ -82,6 +83,15 @@ func (c *accountClient) ValidateAccountBalance(ctx context.Context, in *Validate
 	return out, nil
 }
 
+func (c *accountClient) SignIn(ctx context.Context, in *SignInRequest, opts ...grpc.CallOption) (*SignInResponse, error) {
+	out := new(SignInResponse)
+	err := c.cc.Invoke(ctx, "/account.Account/SignIn", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AccountServer is the server API for Account service.
 // All implementations must embed UnimplementedAccountServer
 // for forward compatibility
@@ -91,6 +101,7 @@ type AccountServer interface {
 	GetAccountBalance(context.Context, *GetAccountBalanceRequest) (*GetAccountBalanceResponse, error)
 	SetAccountBalance(context.Context, *SetAccountBalanceRequest) (*SetAccountBalanceResponse, error)
 	ValidateAccountBalance(context.Context, *ValidateAccountBalanceRequest) (*ValidateAccountBalanceResponse, error)
+	SignIn(context.Context, *SignInRequest) (*SignInResponse, error)
 	mustEmbedUnimplementedAccountServer()
 }
 
@@ -112,6 +123,9 @@ func (UnimplementedAccountServer) SetAccountBalance(context.Context, *SetAccount
 }
 func (UnimplementedAccountServer) ValidateAccountBalance(context.Context, *ValidateAccountBalanceRequest) (*ValidateAccountBalanceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ValidateAccountBalance not implemented")
+}
+func (UnimplementedAccountServer) SignIn(context.Context, *SignInRequest) (*SignInResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SignIn not implemented")
 }
 func (UnimplementedAccountServer) mustEmbedUnimplementedAccountServer() {}
 
@@ -216,6 +230,24 @@ func _Account_ValidateAccountBalance_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Account_SignIn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SignInRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AccountServer).SignIn(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/account.Account/SignIn",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AccountServer).SignIn(ctx, req.(*SignInRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Account_ServiceDesc is the grpc.ServiceDesc for Account service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -242,6 +274,10 @@ var Account_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ValidateAccountBalance",
 			Handler:    _Account_ValidateAccountBalance_Handler,
+		},
+		{
+			MethodName: "SignIn",
+			Handler:    _Account_SignIn_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

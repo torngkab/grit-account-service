@@ -13,6 +13,7 @@ service Account {
   rpc GetAccountBalance (GetAccountBalanceRequest) returns (GetAccountBalanceResponse) {}
   rpc SetAccountBalance (SetAccountBalanceRequest) returns (SetAccountBalanceResponse) {}
   rpc ValidateAccountBalance (ValidateAccountBalanceRequest) returns (ValidateAccountBalanceResponse) {}
+  rpc SignIn (SignInRequest) returns (SignInResponse) {}
 }
 
 message CreateUserRequest {
@@ -68,4 +69,13 @@ message ValidateAccountBalanceRequest {
 
 message ValidateAccountBalanceResponse {
   bool is_valid = 1;
+}
+
+message SignInRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message SignInResponse {
+  string user_id = 1;
 }

@@ -181,6 +181,26 @@ func (s *server) ValidateAccountBalance(ctx context.Context, in *pb.ValidateAcco
 	return &pb.ValidateAccountBalanceResponse{IsValid: balance.Balance >= float64(in.GetAmount())}, nil
 }
 
+func (s *server) SignIn(ctx context.Context, in *pb.SignInRequest) (*pb.SignInResponse, error) {
+	// declare user
+	user := model.User{}
+
+	// get user
+	err := s.gorm.Where("username = ?", in.GetUsername()).First(&user).Error
+	if err != nil {
+		log.Printf("failed to get user: %v", err)
+		return nil, errors.New("invalid username or password")
+	}
+
+	// validate password
+	if !utils.ComparePassword(user.Password, in.GetPassword()) {
+		log.Printf("invalid password")
+		return nil, errors.New("invalid username or password")
+	}
+
+	return &pb.SignInResponse{UserId: user.Id.String()}, nil
+}
+
 func main() {
 	// Get config
 	config := config.C("")
