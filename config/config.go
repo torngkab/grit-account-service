@@ -12,6 +12,7 @@ type Config struct {
 	Env      string `env:"ENV" default:"LOCAL"`
 	Server   Server
 	Database Database
+	Service  Service
 }
 
 type Server struct {
@@ -21,6 +22,10 @@ type Server struct {
 
 type Database struct {
 	PostgresURL string `env:"POSTGRES_URL"`
+}
+
+type Service struct {
+	ReferralService string `env:"REFERRAL_SERVICE"`
 }
 
 var once sync.Once

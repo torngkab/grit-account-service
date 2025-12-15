@@ -11,6 +11,7 @@ import (
 
 	"github.com/google/uuid"
 	pb "github.com/torngkab/grit-account-service/account"
+	"github.com/torngkab/grit-account-service/adapters/referralservice"
 	"github.com/torngkab/grit-account-service/config"
 	"github.com/torngkab/grit-account-service/database"
 	"github.com/torngkab/grit-account-service/model"
@@ -22,7 +23,8 @@ import (
 
 type server struct {
 	pb.UnimplementedAccountServer
-	gorm *gorm.DB
+	gorm                   *gorm.DB
+	referralServiceAdapter referralservice.ReferralServiceAdapter
 }
 
 func (s *server) CreateUser(ctx context.Context, in *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
@@ -76,13 +78,28 @@ func (s *server) CreateUser(ctx context.Context, in *pb.CreateUserRequest) (*pb.
 			return err
 		}
 
+		// Send referral code to referral service
+		_, err := s.referralServiceAdapter.CreateReferral(ctx, user.Id.String())
+		if err != nil {
+			log.Printf("failed to create referral: %v", err)
+			return err
+		}
+
 		return nil
 	})
 	if err != nil {
 		return &pb.CreateUserResponse{Message: err.Error()}, nil
 	}
 
-	// TODO: Send referral code to referral service...
+	// Use referral code on referral service
+	// TODO: rollback flow if use referral failed
+	if in.GetReferralCode() != "" {
+		_, err = s.referralServiceAdapter.UseReferral(ctx, in.GetReferralCode(), user.Id.String())
+		if err != nil {
+			log.Printf("failed to use referral: %v", err)
+			return &pb.CreateUserResponse{Message: err.Error()}, nil
+		}
+	}
 
 	return &pb.CreateUserResponse{Message: "user created successfully"}, nil
 }
@@ -321,8 +338,10 @@ func main() {
 	s := grpc.NewServer()
 
 	pb.RegisterAccountServer(s, &server{
-		gorm: gormDB,
+		gorm:                   gormDB,
+		referralServiceAdapter: referralservice.NewReferralServiceAdapter(config),
 	})
+
 	log.Printf("server listening at %v", lis.Addr())
 
 	if err := s.Serve(lis); err != nil {
