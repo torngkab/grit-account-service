@@ -4,9 +4,13 @@ WORKDIR /app
 
 COPY go.mod go.sum ./
 
-RUN go mod download && go mod verify
+RUN apk add git && git config --global url."https://torngkab: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@github.com/".insteadOf "https://github.com/"
+
+RUN go env -w GOPRIVATE=github.com/torngkab/* && go mod download && go mod verify
 
 COPY . .
+
+COPY .env.example .env
 
 RUN go build -o accounts-service main.go
 
