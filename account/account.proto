@@ -10,6 +10,7 @@ package account;
 service Account {
   rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {}
   rpc GetAccountsByUserId (GetAccountsByUserIdRequest) returns (GetAccountsByUserIdResponse) {}
+  rpc GetReferralAccount (GetReferralAccountRequest) returns (GetReferralAccountResponse) {}
   rpc GetAccountBalance (GetAccountBalanceRequest) returns (GetAccountBalanceResponse) {}
   rpc SetAccountBalance (SetAccountBalanceRequest) returns (SetAccountBalanceResponse) {}
   rpc ValidateAccountBalance (ValidateAccountBalanceRequest) returns (ValidateAccountBalanceResponse) {}
@@ -32,6 +33,12 @@ message GetAccountsByUserIdRequest {
 
 message GetAccountsByUserIdResponse {
   repeated AccountModel accounts = 1;
+}
+
+message GetReferralAccountRequest {}
+
+message GetReferralAccountResponse {
+  AccountModel account = 1;
 }
 
 message AccountModel {

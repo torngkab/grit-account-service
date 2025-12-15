@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type AccountClient interface {
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
 	GetAccountsByUserId(ctx context.Context, in *GetAccountsByUserIdRequest, opts ...grpc.CallOption) (*GetAccountsByUserIdResponse, error)
+	GetReferralAccount(ctx context.Context, in *GetReferralAccountRequest, opts ...grpc.CallOption) (*GetReferralAccountResponse, error)
 	GetAccountBalance(ctx context.Context, in *GetAccountBalanceRequest, opts ...grpc.CallOption) (*GetAccountBalanceResponse, error)
 	SetAccountBalance(ctx context.Context, in *SetAccountBalanceRequest, opts ...grpc.CallOption) (*SetAccountBalanceResponse, error)
 	ValidateAccountBalance(ctx context.Context, in *ValidateAccountBalanceRequest, opts ...grpc.CallOption) (*ValidateAccountBalanceResponse, error)
@@ -50,6 +51,15 @@ func (c *accountClient) CreateUser(ctx context.Context, in *CreateUserRequest, o
 func (c *accountClient) GetAccountsByUserId(ctx context.Context, in *GetAccountsByUserIdRequest, opts ...grpc.CallOption) (*GetAccountsByUserIdResponse, error) {
 	out := new(GetAccountsByUserIdResponse)
 	err := c.cc.Invoke(ctx, "/account.Account/GetAccountsByUserId", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *accountClient) GetReferralAccount(ctx context.Context, in *GetReferralAccountRequest, opts ...grpc.CallOption) (*GetReferralAccountResponse, error) {
+	out := new(GetReferralAccountResponse)
+	err := c.cc.Invoke(ctx, "/account.Account/GetReferralAccount", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -98,6 +108,7 @@ func (c *accountClient) SignIn(ctx context.Context, in *SignInRequest, opts ...g
 type AccountServer interface {
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	GetAccountsByUserId(context.Context, *GetAccountsByUserIdRequest) (*GetAccountsByUserIdResponse, error)
+	GetReferralAccount(context.Context, *GetReferralAccountRequest) (*GetReferralAccountResponse, error)
 	GetAccountBalance(context.Context, *GetAccountBalanceRequest) (*GetAccountBalanceResponse, error)
 	SetAccountBalance(context.Context, *SetAccountBalanceRequest) (*SetAccountBalanceResponse, error)
 	ValidateAccountBalance(context.Context, *ValidateAccountBalanceRequest) (*ValidateAccountBalanceResponse, error)
@@ -114,6 +125,9 @@ func (UnimplementedAccountServer) CreateUser(context.Context, *CreateUserRequest
 }
 func (UnimplementedAccountServer) GetAccountsByUserId(context.Context, *GetAccountsByUserIdRequest) (*GetAccountsByUserIdResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAccountsByUserId not implemented")
+}
+func (UnimplementedAccountServer) GetReferralAccount(context.Context, *GetReferralAccountRequest) (*GetReferralAccountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetReferralAccount not implemented")
 }
 func (UnimplementedAccountServer) GetAccountBalance(context.Context, *GetAccountBalanceRequest) (*GetAccountBalanceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAccountBalance not implemented")
@@ -172,6 +186,24 @@ func _Account_GetAccountsByUserId_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AccountServer).GetAccountsByUserId(ctx, req.(*GetAccountsByUserIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Account_GetReferralAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetReferralAccountRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AccountServer).GetReferralAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/account.Account/GetReferralAccount",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AccountServer).GetReferralAccount(ctx, req.(*GetReferralAccountRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -262,6 +294,10 @@ var Account_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAccountsByUserId",
 			Handler:    _Account_GetAccountsByUserId_Handler,
+		},
+		{
+			MethodName: "GetReferralAccount",
+			Handler:    _Account_GetReferralAccount_Handler,
 		},
 		{
 			MethodName: "GetAccountBalance",

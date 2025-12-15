@@ -118,6 +118,27 @@ func (s *server) GetAccountsByUserId(ctx context.Context, in *pb.GetAccountsByUs
 	return &pb.GetAccountsByUserIdResponse{Accounts: accountsPb}, nil
 }
 
+func (s *server) GetReferralAccount(ctx context.Context, in *pb.GetReferralAccountRequest) (*pb.GetReferralAccountResponse, error) {
+	// declare account
+	account := model.Account{}
+
+	// get account
+	err := s.gorm.Where("account_type = ?", model.AccountTypeReferral).First(&account).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// convert account to protobuf
+	return &pb.GetReferralAccountResponse{Account: &pb.AccountModel{
+		Id:          account.Id.String(),
+		UserId:      account.UserId.String(),
+		AccountType: string(account.AccountType),
+		Status:      string(account.Status),
+		CreatedAt:   account.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:   account.UpdatedAt.Format(time.RFC3339),
+	}}, nil
+}
+
 func (s *server) GetAccountBalance(ctx context.Context, in *pb.GetAccountBalanceRequest) (*pb.GetAccountBalanceResponse, error) {
 	// declare balance
 	balance := model.Balance{}
